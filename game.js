@@ -59,7 +59,18 @@ board = Chessboard('board', config);
 
 // Thêm event listener cho click vào ô cờ
 $(document).on('click', '.square-55d63', function() {
-    var square = $(this).attr('data-square');
+    // Lấy tất cả các class của ô
+    var classes = $(this).attr('class').split(' ');
+    var square = null;
+    
+    // Tìm class có dạng "square-a1", "square-b2", etc.
+    for (var i = 0; i < classes.length; i++) {
+        if (classes[i].indexOf('square-') === 0 && classes[i].length === 9) {
+            square = classes[i].substring(7); // Lấy phần sau "square-"
+            break;
+        }
+    }
+    
     if (square) {
         onSquareClick(square);
     }
