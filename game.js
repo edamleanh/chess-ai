@@ -6,7 +6,6 @@ var playerColor = 'w';
 var isThinking = false;
 var selectedSquare = null;
 var possibleMoves = [];
-var gameStarted = false;
 
 // Khởi tạo Stockfish engine
 function initStockfish() {
@@ -53,40 +52,21 @@ var config = {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
-    onClick: onSquareClick,
     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
 };
 
 board = Chessboard('board', config);
 
-// Bắt đầu game với màu đã chọn
-function startGameWithColor(color) {
-    playerColor = color === 'white' ? 'w' : 'b';
-    gameStarted = true;
-    
-    // Ẩn modal chọn màu
-    document.getElementById('colorSelection').classList.add('hidden');
-    
-    // Cập nhật subtitle
-    var subtitle = document.getElementById('subtitle');
-    if (playerColor === 'w') {
-        subtitle.textContent = 'Bạn chơi quân Trắng - AI chơi quân Đen';
-        board.orientation('white');
-    } else {
-        subtitle.textContent = 'Bạn chơi quân Đen - AI chơi quân Trắng';
-        board.orientation('black');
-        // Nếu chơi quân đen, để máy đi trước
-        window.setTimeout(makeStockfishThink, 500);
+// Thêm event listener cho click vào ô cờ
+$(document).on('click', '.square-55d63', function() {
+    var square = $(this).attr('data-square');
+    if (square) {
+        onSquareClick(square);
     }
-    
-    updateStatus();
-}
+});
 
 // Xử lý click vào ô cờ
 function onSquareClick(square) {
-    // Không cho click khi chưa chọn màu
-    if (!gameStarted) return;
-    
     // Không cho click khi game kết thúc hoặc máy đang suy nghĩ
     if (game.game_over() || isThinking) return;
     
@@ -176,9 +156,6 @@ function removeHighlights() {
 
 // Chỉ cho phép kéo quân của người chơi
 function onDragStart(source, piece, position, orientation) {
-    // Không cho kéo khi chưa chọn màu
-    if (!gameStarted) return false;
-    
     // Không cho kéo khi game kết thúc
     if (game.game_over()) return false;
     
@@ -375,13 +352,6 @@ function newGame() {
     removeHighlights();
     selectedSquare = null;
     possibleMoves = [];
-    gameStarted = false;
-    playerColor = 'w';
-    
-    // Hiện modal chọn màu
-    document.getElementById('colorSelection').classList.remove('hidden');
-    document.getElementById('subtitle').textContent = 'Chọn quân cờ để bắt đầu';
-    
     updateStatus();
     document.getElementById('moveHistory').innerHTML = '<em>Chưa có nước đi nào</em>';
     document.getElementById('gameOver').classList.remove('active');
