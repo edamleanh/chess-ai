@@ -57,31 +57,43 @@ var config = {
 
 board = Chessboard('board', config);
 
-// Thêm event listener cho click vào ô cờ
-$(document).on('click', '.square-55d63', function(e) {
-    console.log('Click detected!');
+// Đợi board render xong rồi mới thêm event listener
+window.setTimeout(function() {
+    console.log('Setting up click handlers...');
     
-    // Lấy tất cả các class của ô
-    var classes = $(this).attr('class');
-    console.log('Classes:', classes);
+    // Lấy tất cả các ô cờ
+    var squares = document.querySelectorAll('.square-55d63');
+    console.log('Found', squares.length, 'squares');
     
-    var classList = classes.split(' ');
-    var square = null;
+    squares.forEach(function(squareElement) {
+        squareElement.addEventListener('click', function(e) {
+            console.log('Click detected on element!');
+            
+            // Lấy tất cả các class của ô
+            var classes = this.className;
+            console.log('Classes:', classes);
+            
+            var classList = classes.split(' ');
+            var square = null;
+            
+            // Tìm class có dạng "square-a1", "square-b2", etc.
+            for (var i = 0; i < classList.length; i++) {
+                if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
+                    square = classList[i].substring(7); // Lấy phần sau "square-"
+                    break;
+                }
+            }
+            
+            console.log('Square detected:', square);
+            
+            if (square) {
+                onSquareClick(square);
+            }
+        });
+    });
     
-    // Tìm class có dạng "square-a1", "square-b2", etc.
-    for (var i = 0; i < classList.length; i++) {
-        if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
-            square = classList[i].substring(7); // Lấy phần sau "square-"
-            break;
-        }
-    }
-    
-    console.log('Square detected:', square);
-    
-    if (square) {
-        onSquareClick(square);
-    }
-});
+    console.log('Click handlers set up!');
+}, 500);
 
 // Xử lý click vào ô cờ
 function onSquareClick(square) {
