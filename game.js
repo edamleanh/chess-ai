@@ -47,7 +47,7 @@ function initStockfish() {
 
 // Cấu hình board
 var config = {
-    draggable: true,
+    draggable: false, // Tắt drag để dùng click
     position: 'start',
     onDragStart: onDragStart,
     onDrop: onDrop,
