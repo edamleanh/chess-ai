@@ -67,8 +67,10 @@ window.setTimeout(function() {
     if (boardElement) {
         console.log('Board element found, adding click listener');
         
+        // Dùng capture phase để bắt event trước khi bị chặn
         boardElement.addEventListener('click', function(e) {
             console.log('Click detected on board!', e.target);
+            console.log('Target tag:', e.target.tagName, 'Target classes:', e.target.className);
             
             // Tìm ô cờ gần nhất (có thể click vào piece hoặc square)
             var target = e.target;
@@ -83,6 +85,14 @@ window.setTimeout(function() {
             else if (target.classList.contains('square-55d63')) {
                 squareElement = target;
                 console.log('Clicked on square directly');
+            }
+            // Nếu click vào child khác, thử tìm parent square
+            else {
+                var parent = target.parentElement;
+                if (parent && parent.classList.contains('square-55d63')) {
+                    squareElement = parent;
+                    console.log('Clicked on child element, found parent square');
+                }
             }
             
             if (squareElement) {
@@ -106,9 +116,9 @@ window.setTimeout(function() {
                     onSquareClick(square);
                 }
             } else {
-                console.log('No valid square element found');
+                console.log('No valid square element found, target was:', target);
             }
-        });
+        }, true); // true = capture phase
         
         console.log('Click handler set up on board!');
     } else {
