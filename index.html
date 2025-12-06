@@ -323,6 +323,81 @@
             }
         }
         
+        /* Color selection modal */
+        .color-selection {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .color-selection.hidden {
+            display: none;
+        }
+        
+        .color-selection-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .color-selection-content h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .color-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .color-btn {
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+        
+        .color-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .color-btn.white {
+            background: white;
+            color: #333;
+            border-color: #333;
+        }
+        
+        .color-btn.white:hover {
+            background: #f0f0f0;
+        }
+        
+        .color-btn.black {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+        
+        .color-btn.black:hover {
+            background: #444;
+        }
+        
         .game-over {
             display: none;
             position: fixed;
@@ -397,126 +472,20 @@
             background-color: #769656 !important;
             color: #eeeed2 !important;
         }
-        
-        /* Modal chọn màu quân */
-        .color-selection-modal {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .color-selection-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
-        }
-        
-        .color-selection-content h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-        
-        .color-selection-content p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-        
-        .color-options {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .color-option {
-            width: 120px;
-            height: 120px;
-            border-radius: 15px;
-            border: 3px solid #ddd;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: #f8f9fa;
-        }
-        
-        .color-option:hover {
-            transform: translateY(-5px);
-            border-color: #667eea;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-        
-        .color-option svg {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .color-option span {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
     </style>
 </head>
 <body>
-    <!-- Modal chọn màu quân -->
-    <div id="colorSelectionModal" class="color-selection-modal">
+    <!-- Color Selection Modal -->
+    <div class="color-selection" id="colorSelection">
         <div class="color-selection-content">
-            <h2>🎯 Chọn màu quân của bạn</h2>
-            <p>Bạn muốn chơi quân trắng hay quân đen?</p>
-            <div class="color-options">
-                <div class="color-option" onclick="selectColor('white')">
-                    <svg viewBox="0 0 45 45">
-                        <g fill="#fff" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M 22.5,11.63 L 22.5,6" stroke-linejoin="miter"/>
-                            <path d="M 20,8 L 25,8" stroke-linecap="butt"/>
-                            <path d="M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25" stroke-linecap="butt" stroke-linejoin="miter"/>
-                            <path d="M 12.5,37 C 18,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 20,16 10.5,13 6.5,19.5 C 3.5,25.5 12.5,30 12.5,30 L 12.5,37" stroke-linecap="butt"/>
-                            <path d="M 12.5,30 C 18,27 27,27 32.5,30" fill="none"/>
-                            <path d="M 12.5,33.5 C 18,30.5 27,30.5 32.5,33.5" fill="none"/>
-                            <path d="M 12.5,37 C 18,34 27,34 32.5,37" fill="none"/>
-                        </g>
-                    </svg>
-                    <span>Quân Trắng</span>
-                </div>
-                <div class="color-option" onclick="selectColor('black')">
-                    <svg viewBox="0 0 45 45">
-                        <g fill="#000" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M 22.5,11.63 L 22.5,6" stroke-linejoin="miter"/>
-                            <path d="M 20,8 L 25,8" stroke-linecap="butt"/>
-                            <path d="M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25" stroke-linecap="butt" stroke-linejoin="miter"/>
-                            <path d="M 12.5,37 C 18,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 20,16 10.5,13 6.5,19.5 C 3.5,25.5 12.5,30 12.5,30 L 12.5,37" stroke-linecap="butt"/>
-                            <path d="M 12.5,30 C 18,27 27,27 32.5,30" fill="none"/>
-                            <path d="M 12.5,33.5 C 18,30.5 27,30.5 32.5,33.5" fill="none"/>
-                            <path d="M 12.5,37 C 18,34 27,34 32.5,37" fill="none"/>
-                        </g>
-                    </svg>
-                    <span>Quân Đen</span>
-                </div>
-                <div class="color-option" onclick="selectColor('random')">
-                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="40" fill="#667eea"/>
-                        <text x="50" y="65" font-size="50" text-anchor="middle" fill="white">?</text>
-                    </svg>
-                    <span>Ngẫu nhiên</span>
-                </div>
+            <h2>Chọn màu quân của bạn</h2>
+            <div class="color-buttons">
+                <button class="color-btn white" onclick="selectColor('white')">⚪ Quân Trắng</button>
+                <button class="color-btn black" onclick="selectColor('black')">⚫ Quân Đen</button>
             </div>
         </div>
     </div>
+
     <div class="container">
         <h1>♟️ Chess vs AI</h1>
         <p class="subtitle">Bạn chơi quân Trắng - AI chơi quân Đen</p>
