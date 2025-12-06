@@ -58,18 +58,25 @@ var config = {
 board = Chessboard('board', config);
 
 // Thêm event listener cho click vào ô cờ
-$(document).on('click', '.square-55d63', function() {
+$(document).on('click', '.square-55d63', function(e) {
+    console.log('Click detected!');
+    
     // Lấy tất cả các class của ô
-    var classes = $(this).attr('class').split(' ');
+    var classes = $(this).attr('class');
+    console.log('Classes:', classes);
+    
+    var classList = classes.split(' ');
     var square = null;
     
     // Tìm class có dạng "square-a1", "square-b2", etc.
-    for (var i = 0; i < classes.length; i++) {
-        if (classes[i].indexOf('square-') === 0 && classes[i].length === 9) {
-            square = classes[i].substring(7); // Lấy phần sau "square-"
+    for (var i = 0; i < classList.length; i++) {
+        if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
+            square = classList[i].substring(7); // Lấy phần sau "square-"
             break;
         }
     }
+    
+    console.log('Square detected:', square);
     
     if (square) {
         onSquareClick(square);
@@ -78,6 +85,9 @@ $(document).on('click', '.square-55d63', function() {
 
 // Xử lý click vào ô cờ
 function onSquareClick(square) {
+    console.log('onSquareClick called with:', square);
+    console.log('Game over:', game.game_over(), 'Thinking:', isThinking, 'Turn:', game.turn());
+    
     // Không cho click khi game kết thúc hoặc máy đang suy nghĩ
     if (game.game_over() || isThinking) return;
     
@@ -85,9 +95,12 @@ function onSquareClick(square) {
     if (game.turn() !== playerColor) return;
     
     var piece = game.get(square);
+    console.log('Piece at', square, ':', piece);
     
     // Nếu click vào quân của mình
     if (piece && piece.color === game.turn()) {
+        console.log('Selected own piece at', square);
+        
         // Hủy selection cũ
         removeHighlights();
         
@@ -101,6 +114,8 @@ function onSquareClick(square) {
             verbose: true
         });
         
+        console.log('Possible moves:', possibleMoves);
+        
         // Highlight các ô có thể đi
         possibleMoves.forEach(function(move) {
             highlightMove(move.to, move.flags.includes('c'));
@@ -108,11 +123,15 @@ function onSquareClick(square) {
     }
     // Nếu click vào ô đích hợp lệ
     else if (selectedSquare && possibleMoves.length > 0) {
+        console.log('Trying to move from', selectedSquare, 'to', square);
+        
         var moveObj = possibleMoves.find(function(m) {
             return m.to === square;
         });
         
         if (moveObj) {
+            console.log('Valid move found:', moveObj);
+            
             // Thực hiện nước đi
             var move = game.move({
                 from: selectedSquare,
@@ -136,6 +155,7 @@ function onSquareClick(square) {
                 }
             }
         } else {
+            console.log('Invalid move - clearing selection');
             // Click vào ô không hợp lệ - hủy selection
             removeHighlights();
             selectedSquare = null;
