@@ -30,6 +30,9 @@ function selectColor(color) {
         
         board = Chessboard('board', config);
         
+        // Setup click handlers sau khi board được khởi tạo
+        setTimeout(setupClickHandlers, 200);
+        
         // Nếu chọn đen, lật bàn cờ và để AI đi trước
         if (color === 'black') {
             board.orientation('black');
@@ -81,8 +84,8 @@ function initStockfish() {
 
 // Board sẽ được khởi tạo sau khi người chơi chọn màu
 
-// Đợi board render xong rồi mới thêm event listener
-window.setTimeout(function() {
+// Setup click handlers
+function setupClickHandlers() {
     console.log('Setting up click handlers...');
     
     // Bắt click ở cả board để tránh bị quân cờ chặn
@@ -148,7 +151,7 @@ window.setTimeout(function() {
     } else {
         console.error('Board element not found!');
     }
-}, 500);
+}
 
 // Xử lý click vào ô cờ
 function onSquareClick(square) {
@@ -159,7 +162,11 @@ function onSquareClick(square) {
     if (game.game_over() || isThinking) return;
     
     // Không cho click khi không phải lượt người chơi
-    if (game.turn() !== playerColor) return;
+    var playerTurn = (playerColor === 'white') ? 'w' : 'b';
+    if (game.turn() !== playerTurn) {
+        console.log('Not player turn. Player:', playerColor, 'Turn:', game.turn());
+        return;
+    }
     
     var piece = game.get(square);
     console.log('Piece at', square, ':', piece);
