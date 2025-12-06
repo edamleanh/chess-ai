@@ -140,6 +140,15 @@ function onSquareClick(square) {
     var piece = game.get(square);
     console.log('Piece at', square, ':', piece);
     
+    // Nếu click vào quân đang được chọn → Hủy selection
+    if (selectedSquare === square) {
+        console.log('Deselecting piece at', square);
+        removeHighlights();
+        selectedSquare = null;
+        possibleMoves = [];
+        return;
+    }
+    
     // Nếu click vào quân của mình
     if (piece && piece.color === game.turn()) {
         console.log('Selected own piece at', square);
