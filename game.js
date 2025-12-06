@@ -20,11 +20,8 @@ function selectColor(color) {
     // Khởi tạo board sau khi container hiện
     setTimeout(function() {
         var config = {
-            draggable: true,
+            draggable: false, // Tắt drag-and-drop, chỉ dùng click
             position: 'start',
-            onDragStart: onDragStart,
-            onDrop: onDrop,
-            onSnapEnd: onSnapEnd,
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
         };
         
