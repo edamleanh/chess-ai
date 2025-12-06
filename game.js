@@ -17,14 +17,28 @@ function selectColor(color) {
     // Hiện game container
     document.getElementById('gameContainer').classList.remove('hidden');
     
-    // Nếu chọn đen, lật bàn cờ và để AI đi trước
-    if (color === 'black') {
-        board.orientation('black');
-        // Đợi 500ms rồi để AI đi nước đầu
-        setTimeout(function() {
-            makeStockfishThink();
-        }, 500);
-    }
+    // Khởi tạo board sau khi container hiện
+    setTimeout(function() {
+        var config = {
+            draggable: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+        
+        board = Chessboard('board', config);
+        
+        // Nếu chọn đen, lật bàn cờ và để AI đi trước
+        if (color === 'black') {
+            board.orientation('black');
+            // Đợi 500ms rồi để AI đi nước đầu
+            setTimeout(function() {
+                makeStockfishThink();
+            }, 500);
+        }
+    }, 100);
 }
 
 // Khởi tạo Stockfish engine
@@ -65,16 +79,7 @@ function initStockfish() {
     }
 }
 
-// Cấu hình và khởi tạo board
-var config = {
-    draggable: true,
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd
-};
-
-board = Chessboard('board', config);
+// Board sẽ được khởi tạo sau khi người chơi chọn màu
 
 // Đợi board render xong rồi mới thêm event listener
 window.setTimeout(function() {
