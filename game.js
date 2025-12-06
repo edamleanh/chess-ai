@@ -4,6 +4,8 @@ var board = null;
 var stockfish = null;
 var playerColor = 'w';
 var isThinking = false;
+var selectedSquare = null;
+var possibleMoves = [];
 
 // Khởi tạo Stockfish engine
 function initStockfish() {
@@ -50,10 +52,100 @@ var config = {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
+    onClick: onSquareClick,
     pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
 };
 
 board = Chessboard('board', config);
+
+// Xử lý click vào ô cờ
+function onSquareClick(square) {
+    // Không cho click khi game kết thúc hoặc máy đang suy nghĩ
+    if (game.game_over() || isThinking) return;
+    
+    // Không cho click khi không phải lượt người chơi
+    if (game.turn() !== playerColor) return;
+    
+    var piece = game.get(square);
+    
+    // Nếu click vào quân của mình
+    if (piece && piece.color === game.turn()) {
+        // Hủy selection cũ
+        removeHighlights();
+        
+        // Chọn quân mới
+        selectedSquare = square;
+        highlightSquare(square);
+        
+        // Lấy các nước đi khả dụng
+        possibleMoves = game.moves({
+            square: square,
+            verbose: true
+        });
+        
+        // Highlight các ô có thể đi
+        possibleMoves.forEach(function(move) {
+            highlightMove(move.to, move.flags.includes('c'));
+        });
+    }
+    // Nếu click vào ô đích hợp lệ
+    else if (selectedSquare && possibleMoves.length > 0) {
+        var moveObj = possibleMoves.find(function(m) {
+            return m.to === square;
+        });
+        
+        if (moveObj) {
+            // Thực hiện nước đi
+            var move = game.move({
+                from: selectedSquare,
+                to: square,
+                promotion: 'q'
+            });
+            
+            if (move) {
+                board.position(game.fen());
+                removeHighlights();
+                selectedSquare = null;
+                possibleMoves = [];
+                
+                updateStatus();
+                updateMoveHistory();
+                
+                if (game.game_over()) {
+                    handleGameOver();
+                } else {
+                    window.setTimeout(makeStockfishThink, 250);
+                }
+            }
+        } else {
+            // Click vào ô không hợp lệ - hủy selection
+            removeHighlights();
+            selectedSquare = null;
+            possibleMoves = [];
+        }
+    }
+}
+
+// Highlight ô được chọn
+function highlightSquare(square) {
+    var $square = $('#board .square-' + square);
+    $square.addClass('highlight-square');
+}
+
+// Highlight ô có thể di chuyển
+function highlightMove(square, isCapture) {
+    var $square = $('#board .square-' + square);
+    if (isCapture) {
+        $square.addClass('highlight-capture');
+    } else {
+        $square.addClass('highlight-move');
+    }
+}
+
+// Xóa tất cả highlight
+function removeHighlights() {
+    $('#board .square-55d63').removeClass('highlight-square highlight-move highlight-capture');
+}
 
 // Chỉ cho phép kéo quân của người chơi
 function onDragStart(source, piece, position, orientation) {
@@ -72,6 +164,11 @@ function onDragStart(source, piece, position, orientation) {
 
 // Xử lý khi thả quân
 function onDrop(source, target) {
+    // Xóa highlights
+    removeHighlights();
+    selectedSquare = null;
+    possibleMoves = [];
+    
     // Kiểm tra nước đi có hợp lệ không
     var move = game.move({
         from: source,
@@ -245,6 +342,9 @@ function handleGameOver() {
 function newGame() {
     game.reset();
     board.start();
+    removeHighlights();
+    selectedSquare = null;
+    possibleMoves = [];
     updateStatus();
     document.getElementById('moveHistory').innerHTML = '<em>Chưa có nước đi nào</em>';
     document.getElementById('gameOver').classList.remove('active');
@@ -269,6 +369,9 @@ function undoMove() {
     }
     
     board.position(game.fen());
+    removeHighlights();
+    selectedSquare = null;
+    possibleMoves = [];
     updateStatus();
     updateMoveHistory();
 }
