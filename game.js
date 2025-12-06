@@ -2,7 +2,7 @@
 var game = new Chess();
 var board = null;
 var stockfish = null;
-var playerColor = 'w';
+var playerColor = null; // Sẽ được set khi người chơi chọn màu quân
 var isThinking = false;
 var selectedSquare = null;
 var possibleMoves = [];
@@ -45,20 +45,10 @@ function initStockfish() {
     }
 }
 
-// Cấu hình board
-var config = {
-    draggable: false, // Tắt drag để dùng click
-    position: 'start',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd,
-    pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-};
+// Chỉ khởi tạo config và board sau khi chọn màu, không khởi tạo ở đây nữa
 
-board = Chessboard('board', config);
-
-// Đợi board render xong rồi mới thêm event listener
-window.setTimeout(function() {
+// Hàm để thiết lập click handlers
+function setupClickHandlers() {
     console.log('Setting up click handlers...');
     
     // Bắt click ở cả board để tránh bị quân cờ chặn
@@ -67,64 +57,46 @@ window.setTimeout(function() {
     if (boardElement) {
         console.log('Board element found, adding click listener');
         
-        // Dùng capture phase để bắt event trước khi bị chặn
         boardElement.addEventListener('click', function(e) {
             console.log('Click detected on board!', e.target);
-            console.log('Target tag:', e.target.tagName, 'Target classes:', e.target.className);
             
-            // Tìm ô cờ gần nhất (có thể click vào piece hoặc square)
             var target = e.target;
             var squareElement = null;
             
-            // Nếu click vào piece, lấy parent (square)
+            // Tìm ô cờ
             if (target.classList.contains('piece-417db')) {
                 squareElement = target.parentElement;
-                console.log('Clicked on piece, parent:', squareElement);
-            }
-            // Nếu click trực tiếp vào square
-            else if (target.classList.contains('square-55d63')) {
+            } else if (target.classList.contains('square-55d63')) {
                 squareElement = target;
-                console.log('Clicked on square directly');
-            }
-            // Nếu click vào child khác, thử tìm parent square
-            else {
+            } else {
                 var parent = target.parentElement;
                 if (parent && parent.classList.contains('square-55d63')) {
                     squareElement = parent;
-                    console.log('Clicked on child element, found parent square');
                 }
             }
             
             if (squareElement) {
-                var classes = squareElement.className;
-                console.log('Square classes:', classes);
-                
-                var classList = classes.split(' ');
+                var classes = squareElement.className.split(' ');
                 var square = null;
                 
-                // Tìm class có dạng "square-a1", "square-b2", etc.
-                for (var i = 0; i < classList.length; i++) {
-                    if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
-                        square = classList[i].substring(7);
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].indexOf('square-') === 0 && classes[i].length === 9) {
+                        square = classes[i].substring(7);
                         break;
                     }
                 }
                 
-                console.log('Square detected:', square);
-                
                 if (square) {
                     onSquareClick(square);
                 }
-            } else {
-                console.log('No valid square element found, target was:', target);
             }
-        }, true); // true = capture phase
+        }, true);
         
         console.log('Click handler set up on board!');
     } else {
         console.error('Board element not found!');
     }
-}, 500);
+}
 
 // Xử lý click vào ô cờ
 function onSquareClick(square) {
@@ -135,7 +107,9 @@ function onSquareClick(square) {
     if (game.game_over() || isThinking) return;
     
     // Không cho click khi không phải lượt người chơi
-    if (game.turn() !== playerColor) return;
+    var currentTurn = game.turn(); // 'w' hoặc 'b'
+    var playerTurn = playerColor === 'white' ? 'w' : 'b';
+    if (currentTurn !== playerTurn) return;
     
     var piece = game.get(square);
     console.log('Piece at', square, ':', piece);
@@ -482,9 +456,49 @@ document.getElementById('timeSelect').addEventListener('change', function() {
     console.log('Thời gian suy nghĩ: ' + time);
 });
 
+// Hàm chọn màu quân
+function selectColor(color) {
+    if (color === 'random') {
+        playerColor = Math.random() < 0.5 ? 'white' : 'black';
+    } else {
+        playerColor = color;
+    }
+    
+    console.log('Người chơi chọn:', playerColor);
+    
+    // Ẩn modal
+    document.getElementById('colorSelectionModal').style.display = 'none';
+    
+    // Khởi tạo board với hướng phù hợp
+    var config = {
+        draggable: false, // Tắt kéo thả để test click
+        position: 'start',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+        onSnapEnd: onSnapEnd,
+        orientation: playerColor === 'white' ? 'white' : 'black'
+    };
+    board = Chessboard('board', config);
+    
+    // Thiết lập click handlers
+    setTimeout(function() {
+        setupClickHandlers();
+    }, 100);
+    
+    // Nếu người chơi chọn quân đen, AI đi trước
+    if (playerColor === 'black') {
+        setTimeout(() => {
+            makeStockfishThink();
+        }, 500);
+    }
+    
+    updateStatus();
+    updateMoveHistory();
+}
+
 // Khởi tạo khi trang load
 window.onload = function() {
     initStockfish();
-    updateStatus();
-    updateMoveHistory();
+    // Hiển thị modal chọn màu quân
+    document.getElementById('colorSelectionModal').style.display = 'flex';
 };
