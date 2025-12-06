@@ -302,6 +302,39 @@
                 font-size: 14px;
                 margin-bottom: 20px;
             }
+            
+            .color-selection-content {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+            
+            .color-selection-content h2 {
+                font-size: 22px;
+            }
+            
+            .color-selection-content p {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            
+            .color-options {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .color-option {
+                min-width: 100%;
+                padding: 20px 15px;
+            }
+            
+            .color-option .piece-icon {
+                font-size: 50px;
+                margin-bottom: 10px;
+            }
+            
+            .color-option .piece-name {
+                font-size: 18px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -360,6 +393,86 @@
             font-size: 16px;
         }
         
+        /* Color selection modal */
+        .color-selection {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .color-selection.hidden {
+            display: none;
+        }
+        
+        .color-selection-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .color-selection-content h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+        
+        .color-selection-content p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .color-option {
+            flex: 1;
+            min-width: 150px;
+            padding: 30px 20px;
+            border: 3px solid #e0e7ff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .color-option:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .color-option .piece-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .color-option .piece-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .color-option .piece-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
         /* Highlight cho ô cờ */
         .highlight-square {
             box-shadow: inset 0 0 3px 3px yellow !important;
@@ -377,9 +490,29 @@
     </style>
 </head>
 <body>
+    <!-- Color Selection Modal -->
+    <div class="color-selection" id="colorSelection">
+        <div class="color-selection-content">
+            <h2>♟️ Chọn quân cờ của bạn</h2>
+            <p>Bạn muốn chơi quân gì?</p>
+            <div class="color-options">
+                <div class="color-option" onclick="startGameWithColor('white')">
+                    <div class="piece-icon">♔</div>
+                    <div class="piece-name">Quân Trắng</div>
+                    <div class="piece-desc">Đi trước</div>
+                </div>
+                <div class="color-option" onclick="startGameWithColor('black')">
+                    <div class="piece-icon">♚</div>
+                    <div class="piece-name">Quân Đen</div>
+                    <div class="piece-desc">Đi sau</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <h1>♟️ Chess vs AI</h1>
-        <p class="subtitle">Bạn chơi quân Trắng - AI chơi quân Đen</p>
+        <p class="subtitle" id="subtitle">Chọn quân cờ để bắt đầu</p>
         
         <div id="board"></div>
         
