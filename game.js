@@ -471,7 +471,7 @@ function selectColor(color) {
     
     // Khởi tạo board với hướng phù hợp
     var config = {
-        draggable: false, // Tắt kéo thả để test click
+        draggable: true, // Bật lại kéo thả
         position: 'start',
         onDragStart: onDragStart,
         onDrop: onDrop,
