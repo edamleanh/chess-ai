@@ -61,38 +61,59 @@ board = Chessboard('board', config);
 window.setTimeout(function() {
     console.log('Setting up click handlers...');
     
-    // Lấy tất cả các ô cờ
-    var squares = document.querySelectorAll('.square-55d63');
-    console.log('Found', squares.length, 'squares');
+    // Bắt click ở cả board để tránh bị quân cờ chặn
+    var boardElement = document.getElementById('board');
     
-    squares.forEach(function(squareElement) {
-        squareElement.addEventListener('click', function(e) {
-            console.log('Click detected on element!');
+    if (boardElement) {
+        console.log('Board element found, adding click listener');
+        
+        boardElement.addEventListener('click', function(e) {
+            console.log('Click detected on board!', e.target);
             
-            // Lấy tất cả các class của ô
-            var classes = this.className;
-            console.log('Classes:', classes);
+            // Tìm ô cờ gần nhất (có thể click vào piece hoặc square)
+            var target = e.target;
+            var squareElement = null;
             
-            var classList = classes.split(' ');
-            var square = null;
-            
-            // Tìm class có dạng "square-a1", "square-b2", etc.
-            for (var i = 0; i < classList.length; i++) {
-                if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
-                    square = classList[i].substring(7); // Lấy phần sau "square-"
-                    break;
-                }
+            // Nếu click vào piece, lấy parent (square)
+            if (target.classList.contains('piece-417db')) {
+                squareElement = target.parentElement;
+                console.log('Clicked on piece, parent:', squareElement);
+            }
+            // Nếu click trực tiếp vào square
+            else if (target.classList.contains('square-55d63')) {
+                squareElement = target;
+                console.log('Clicked on square directly');
             }
             
-            console.log('Square detected:', square);
-            
-            if (square) {
-                onSquareClick(square);
+            if (squareElement) {
+                var classes = squareElement.className;
+                console.log('Square classes:', classes);
+                
+                var classList = classes.split(' ');
+                var square = null;
+                
+                // Tìm class có dạng "square-a1", "square-b2", etc.
+                for (var i = 0; i < classList.length; i++) {
+                    if (classList[i].indexOf('square-') === 0 && classList[i].length === 9) {
+                        square = classList[i].substring(7);
+                        break;
+                    }
+                }
+                
+                console.log('Square detected:', square);
+                
+                if (square) {
+                    onSquareClick(square);
+                }
+            } else {
+                console.log('No valid square element found');
             }
         });
-    });
-    
-    console.log('Click handlers set up!');
+        
+        console.log('Click handler set up on board!');
+    } else {
+        console.error('Board element not found!');
+    }
 }, 500);
 
 // Xử lý click vào ô cờ
