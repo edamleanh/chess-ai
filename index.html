@@ -398,6 +398,11 @@
             background: #444;
         }
         
+        /* Ẩn container khi chưa chọn màu */
+        .container.hidden {
+            display: none;
+        }
+        
         .game-over {
             display: none;
             position: fixed;
@@ -486,7 +491,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container hidden" id="gameContainer">
         <h1>♟️ Chess vs AI</h1>
         <p class="subtitle">Bạn chơi quân Trắng - AI chơi quân Đen</p>
         

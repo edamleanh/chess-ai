@@ -14,6 +14,9 @@ function selectColor(color) {
     // Ẩn modal chọn màu
     document.getElementById('colorSelection').classList.add('hidden');
     
+    // Hiện game container
+    document.getElementById('gameContainer').classList.remove('hidden');
+    
     // Nếu chọn đen, lật bàn cờ và để AI đi trước
     if (color === 'black') {
         board.orientation('black');
@@ -62,9 +65,9 @@ function initStockfish() {
     }
 }
 
-// Cấu hình board
+// Cấu hình và khởi tạo board
 var config = {
-    draggable: true, // Bật lại drag-and-drop
+    draggable: true,
     position: 'start',
     onDragStart: onDragStart,
     onDrop: onDrop,
