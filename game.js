@@ -263,27 +263,44 @@ function removeHighlights() {
 
 // Chỉ cho phép kéo quân của người chơi
 function onDragStart(source, piece, position, orientation) {
+    console.log('onDragStart called:', source, piece);
+    
     // Không cho kéo khi game kết thúc
-    if (game.game_over()) return false;
+    if (game.game_over()) {
+        console.log('Game over, cannot drag');
+        return false;
+    }
     
     // Không cho kéo khi máy đang suy nghĩ
-    if (isThinking) return false;
+    if (isThinking) {
+        console.log('AI thinking, cannot drag');
+        return false;
+    }
     
     // Chỉ cho kéo quân của màu người chơi
     var playerTurn = (playerColor === 'white') ? 'w' : 'b';
+    console.log('Player color:', playerColor, 'Player turn:', playerTurn, 'Current turn:', game.turn());
+    
     if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
         (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        console.log('Wrong color piece');
         return false;
     }
     
     // Chỉ cho người chơi kéo khi đến lượt của họ
     if (game.turn() !== playerTurn) {
+        console.log('Not player turn');
         return false;
     }
+    
+    console.log('Drag allowed');
+    return true;
 }
 
 // Xử lý khi thả quân
 function onDrop(source, target) {
+    console.log('onDrop called:', source, '->', target);
+    
     // Xóa highlights
     removeHighlights();
     selectedSquare = null;
@@ -296,8 +313,15 @@ function onDrop(source, target) {
         promotion: 'q' // Luôn phong hậu khi tốt lên cuối bàn
     });
     
+    console.log('Move result:', move);
+    
     // Nếu nước đi không hợp lệ
-    if (move === null) return 'snapback';
+    if (move === null) {
+        console.log('Invalid move - snapback');
+        return 'snapback';
+    }
+    
+    console.log('Valid move - updating status');
     
     // Cập nhật giao diện
     updateStatus();
@@ -310,6 +334,7 @@ function onDrop(source, target) {
     }
     
     // Gọi máy đi
+    console.log('Calling AI to think');
     window.setTimeout(makeStockfishThink, 250);
 }
 
